@@ -4,7 +4,7 @@ import User, { IUser, UserRole } from '../models/User.js';
 import { AppError } from '../utils/appError.js';
 
 export class AuthService {
-    static async register(email: string, password: string, role: UserRole = UserRole.USER): Promise<IUser> {
+    static async register(email: string, password: string): Promise<IUser> {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             throw new AppError('Email already in use', 400, 'EMAIL_ALREADY_EXISTS');
@@ -14,7 +14,7 @@ export class AuthService {
         const user = await User.create({
             email,
             passwordHash,
-            role
+            role: UserRole.USER
         });
 
         return user;
