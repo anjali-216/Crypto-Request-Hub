@@ -3,6 +3,7 @@ import connectDB from './config/db.js';
 import app from './app.js';
 import './workers/order-processing.worker.js';
 import './workers/order-events.listener.js';
+import { seedAdmin } from './utils/seeder.js';
 
 dotenv.config();
 
@@ -14,7 +15,10 @@ process.on('uncaughtException', (err: Error) => {
 });
 
 // Connect Database
-connectDB();
+await connectDB();
+
+// Seed Admin User
+await seedAdmin();
 
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
