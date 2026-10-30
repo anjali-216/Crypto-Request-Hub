@@ -2,7 +2,7 @@ import { Worker, Job } from 'bullmq';
 import { redisConnection } from '../config/redis.js';
 import { ORDER_QUEUE_NAME } from '../config/queue.js';
 import Order, { OrderStatus } from '../models/Order.js';
-import { blockchainService } from '../services/BlockchainService.js';
+import { getBlockchainService } from '../services/BlockchainService.js';
 
 /**
  * BullMQ Worker for processing crypto token requests
@@ -35,7 +35,7 @@ export const orderWorker = new Worker(
             if (!txHash) {
                 // Submit new transaction
                 console.log(`[Worker] Submitting blockchain transaction for ${orderId}...`);
-                txHash = await blockchainService.executeTokenRequest(order.walletAddress, order.amount);
+                txHash = await getBlockchainService().executeTokenRequest(order.walletAddress, order.amount);
 
                 // Immediately save txHash to prevent double submission in case of a crash
                 await Order.findByIdAndUpdate(orderId, { txHash: txHash });
@@ -44,7 +44,7 @@ export const orderWorker = new Worker(
             }
 
             // 4. Wait for transaction receipt
-            await blockchainService.waitForConfirmation(txHash);
+            await getBlockchainService().waitForConfirmation(txHash);
 
             console.log(`[Worker] Execution finished for order: ${orderId}. Moving to completion event.`);
 

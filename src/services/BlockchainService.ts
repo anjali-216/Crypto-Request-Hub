@@ -73,4 +73,12 @@ export class BlockchainService {
     }
 }
 
-export const blockchainService = new BlockchainService();
+// Created on first use so the API can start without blockchain config
+let instance: BlockchainService | null = null;
+
+export const getBlockchainService = (): BlockchainService => {
+    if (!instance) {
+        instance = new BlockchainService();
+    }
+    return instance;
+};
